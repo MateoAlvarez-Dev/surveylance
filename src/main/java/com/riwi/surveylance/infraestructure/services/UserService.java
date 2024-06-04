@@ -65,7 +65,7 @@ public class UserService extends UserMapper implements IUserService{
 
     // UTILS
 
-    private User findById(Integer id){
+    public User findById(Integer id){
         return this.userRepository.findById(id).orElseThrow(() -> new IdNotFoundException("User", id));
     }
     

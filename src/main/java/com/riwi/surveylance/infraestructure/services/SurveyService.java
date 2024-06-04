@@ -1,5 +1,7 @@
 package com.riwi.surveylance.infraestructure.services;
 
+import java.util.Objects;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -9,8 +11,11 @@ import com.riwi.surveylance.api.dto.request.SurveyRequest;
 import com.riwi.surveylance.api.dto.response.SurveyResponse;
 import com.riwi.surveylance.api.dto.response.SurveyResponseFull;
 import com.riwi.surveylance.domain.entities.Survey;
+import com.riwi.surveylance.domain.entities.User;
 import com.riwi.surveylance.domain.repositories.SurveyRepository;
+import com.riwi.surveylance.domain.repositories.UserRepository;
 import com.riwi.surveylance.infraestructure.abstract_services.ISurveyService;
+import com.riwi.surveylance.infraestructure.helpers.EmailHelper;
 import com.riwi.surveylance.util.exceptions.IdNotFoundException;
 import com.riwi.surveylance.util.mappers.SurveyMapper;
 
@@ -22,6 +27,12 @@ public class SurveyService extends SurveyMapper implements ISurveyService{
     
     @Autowired
     private final SurveyRepository surveyRepository;
+
+    @Autowired
+    private final UserService userService;
+
+    @Autowired
+    private final EmailHelper emailHelper;
 
      @Override
     public Page<SurveyResponse> getAll(int page, int size) {
@@ -37,6 +48,15 @@ public class SurveyService extends SurveyMapper implements ISurveyService{
         Survey surveyToSave = this.requestToEntity(request);
         Survey surveySaved = this.surveyRepository.save(surveyToSave);
         SurveyResponse response = this.entityToResponse(surveySaved);
+        User user = this.userService.findById(request.getCreator_id());
+
+        try {
+            if (Objects.nonNull(user.getEmail())) {
+                this.emailHelper.sendMail(user.getEmail(), user.getName());
+            }
+        } catch (Exception e) {
+            System.out.println("No se pudo enviar el correo");
+        }
 
         return response;
     }
