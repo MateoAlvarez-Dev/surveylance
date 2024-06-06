@@ -27,7 +27,7 @@ public class EmailHelper {
         String htmlContent = this.readHTMLTemplate(nameClient);
 
         try {
-            message.setFrom(new InternetAddress("matheoz2003@gmail.com"));
+            message.setFrom(new InternetAddress("survey@gmail.com"));
             message.setSubject("Creacion de encuesta");
 
             message.setRecipients(MimeMessage.RecipientType.TO,destinity);
